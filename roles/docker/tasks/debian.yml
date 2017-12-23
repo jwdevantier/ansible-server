@@ -1,0 +1,30 @@
+
+- name: Install requirements
+  apt:
+    pkg: "{{item}}"
+    state: installed
+    update_cache: true
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg2
+    - software-properties-common
+
+- name: Add repo key
+  apt_key:
+    url: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg"
+    state: present
+
+- name: Add Docker Repo
+  apt_repository:
+    repo: "deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    state: present
+
+- name: Install docker
+  apt:
+    pkg: docker-ce
+    update_cache: true
+    state: installed
+    force: true
+  notify: "restart docker service"

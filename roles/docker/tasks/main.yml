@@ -1,0 +1,7 @@
+---
+# tasks file for docker
+
+- import_tasks: debian.yml
+  when: ansible_distribution|lower == "debian"
+  tags:
+    - docker

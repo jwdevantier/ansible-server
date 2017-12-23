@@ -1,0 +1,91 @@
+---
+
+#- name: Print Config
+#  debug:
+#    msg: "{{vhosts}}"
+
+- name: install necessary software
+  apt:
+    name: "{{item}}"
+    update_cache: yes
+  with_items:
+    - nginx
+    - openssl
+
+# let's link solves the issue of let's encrypt's directory structure
+# not being entirely uniform - if you request (& optionally expand)
+# a SSL cert for multiple subdomains, only an entry for the first subdomain
+# will be made in the 'live' folder.
+- name: install letslink script
+  copy:
+    src: letslink.sh
+    dest: /usr/local/sbin/letslink
+    owner: root
+    group: root
+    mode: 0755
+
+- name: install ssl-renew-script
+  template:
+    src: ssl-cert-renew.j2
+    dest: /usr/local/sbin/ssl-cert-renew
+    owner: root
+    group: root
+    mode: "u=rwx,g=rx,o=r"
+
+- name: install cron entry to automatically refresh SSL certs
+  cron:
+    name: auto-refresh Let's Encrypt SSL certs
+    special_time: daily
+    job: "/usr/local/sbin/ssl-cert-renew"
+
+- name: stop nginx
+  service:
+    name: nginx
+    state: stopped
+
+- name: generate certs
+  shell: >
+    docker run --rm
+    -v {{cert_email}}:/etc/letsencrypt
+    -p 80:80
+    certbot/certbot certonly
+    --standalone
+    --preferred-challenges http
+    -d {{vhosts|map(attribute='server_name')|join(',')}}
+    --agree-tos
+    --non-interactive
+    --text
+    --rsa-key-size 4096
+    --email {{cert_email}}
+    --expand
+
+- name: create SSL cert links
+  shell: letslink {{certs_root}}/archive {{certs_root}}/certs
+
+- name: ensure Diffie-Helman parameters file exists
+  shell: openssl dhparam -dsaparam -out /etc/nginx/dhparam.pem 2048
+  args:
+    creates: /etc/nginx/dhparam.pem
+
+- name: install ssl-params config
+  copy:
+    src: ssl-params.conf
+    dest: /etc/nginx/ssl-params.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  notify: "restart nginx service"
+
+- name: install config
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  notify: "restart nginx service"
+
+- name: restart nginx
+  debug: msg="restarting nginx..."
+  changed_when: true
+  notify: "restart nginx service"

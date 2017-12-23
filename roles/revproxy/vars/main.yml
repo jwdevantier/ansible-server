@@ -1,0 +1,18 @@
+---
+
+# directory holding let's encrypt
+certs_root: /etc/letsencrypt
+
+# Email which will receive notifications as certificates come close to expiring.
+cert_email: cert-admin@example.com
+
+# host entries. Note: you'll have to create "duplicate" entries for each subdomain
+vhosts:
+  - server_name: example.com
+    label: example
+    addr: localhost
+    port: 81
+  - server_name: www.example.com
+    label: www_example
+    addr: localhost
+    port: 81

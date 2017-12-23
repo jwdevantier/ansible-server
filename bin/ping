@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${DIR}/_base"
+
+env_enter
+
+if [ "$#" -eq 0 ]; then
+    exec ansible all -m ping
+elif [ "$#" -eq 1 ]; then
+    exec ansible "${1}" -m ping 
+else
+    echo "args '$#'"
+    echo "usage: `basename $0` [<group>]"
+    exit 1
+fi

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+docker run --rm -v {{certs_root}}:/etc/letsencrypt certbot/certbot certonly --webroot -w /etc/letsencrypt/well-known --preferred-challenges http -d {{vhosts|map(attribute='server_name')|join(',')}} --agree-tos --non-interactive --text --rsa-key-size 4096 --email {{cert_email}} --expand
+systemctl reload nginx

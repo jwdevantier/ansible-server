@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${DIR}/_base"
+
+if [ "$#" -ne 1 ]; then
+    echo "usage: `basename $0` <role-name>"
+    exit 1
+fi
+
+env_enter
+
+if [[ ! -d "roles" ]]; then
+    mkdir "roles"
+fi
+cd "roles"
+exec ansible-galaxy init $1
