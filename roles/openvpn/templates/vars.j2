@@ -1,0 +1,24 @@
+export EASY_RSA="`pwd`"
+
+export OPENSSL="openssl"
+export PKCS11TOOL="pkcs11-tool"
+export GREP="grep"
+
+export KEY_CONFIG=`$EASY_RSA/whichopensslcnf $EASY_RSA`
+
+export KEY_DIR="{{ openvpn_keydir }}"
+
+export PKCS11_MODULE_PATH="dummy"
+export PKCS11_PIN="dummy"
+
+export KEY_SIZE={{ dhparam_size }}
+export KEY_EXPIRE=3650
+
+export KEY_COUNTRY="{{ key.country }}"
+export KEY_PROVINCE="{{ key.province }}"
+export KEY_CITY="{{ key.city }}"
+export KEY_ORG="{{ key.organization }}"
+export KEY_EMAIL="{{ key.email }}"
+export KEY_OU="{{ key.organizational_unit }}"
+
+export KEY_NAME="{{ server_name | default('EasyRSA') }}"

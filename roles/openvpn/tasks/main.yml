@@ -1,0 +1,58 @@
+---
+# tasks file for openvpn
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-an-openvpn-server-on-ubuntu-16-04
+
+
+- set_fact:
+    dhparam_file: "{{ openvpn_confdir }}/dh{{ dhparam_size }}.pem"
+    openvpn_keydir: "{{ openvpn_confdir }}/keys"
+    nw_iface: "{{ nw_iface | default(ansible_default_ipv4.interface) }}"
+
+- name: Install requirements (Debian)
+  apt: name={{item}} force=yes
+  with_items: [openvpn, udev, openssl, zip, easy-rsa]
+
+- name: Check if easy-rsa 2.x is available from the system
+  stat: path=/usr/share/easy-rsa/build-ca
+  register: openvpn_easyrsa_check
+
+- fail:
+    msg: >
+      EasyRSA 2.x is not present in /usr/share/easy-rsa.
+      Ensure the easy-rsa package is installed.
+  when:
+    - not openvpn_easyrsa_check.stat.exists
+
+- name: Generate scripts
+  template: src={{item}}.j2 dest={{openvpn_confdir}}/{{item}} mode=0700
+  with_items: [vars, build-server.sh, build-client.sh, revoke-client.sh]
+
+- name: Enable IPv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    state: present
+
+- name: The Diffie-Hellman parameter file is generated
+  command: "{{dhparam_openssl_binary}} dhparam -out '{{ dhparam_file }}' {{ dhparam_size }}"
+  args:
+creates: "{{ dhparam_file }}"
+
+- name: allow forwarding ip packets through firewall
+  lineinfile:
+    path: /etc/default/ufw
+    regexp: '^DEFAULT_FORWARD_POLICY='
+    line: 'DEFAULT_FORWARD_POLICY="ACCEPT"'
+    state: present
+  register: forward_policy
+# should trigger a handler here to restart ufw
+
+# vpn_cidr: 10.8.0.0/8
+- name: configure masquerading/natting of packets from VPN NW to nw of inet iface
+  lineinfile:
+    path: /etc/ufw/before.rules
+    block: |
+    * nat
+    :POSTROUTING ACCEPT [0:0] 
+    -A POSTROUTING -s {{ vpn_cidr }} -o {{ nw_iface }} -j MASQUERADE
+    COMMIT

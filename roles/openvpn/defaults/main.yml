@@ -1,0 +1,4 @@
+---
+
+# network used for VPN clients
+vpn_cidr: 10.8.0.0/8

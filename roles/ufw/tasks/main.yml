@@ -1,0 +1,16 @@
+---
+
+- name: Install requirements (Debian)
+  apt: name={{item}} force=yes
+  with_items: [ufw]
+
+- name: Enable SSH
+  ufw:
+    app: SSH
+    rule: allow
+
+- name: Enable firewall
+  ufw:
+    state: enabled
+    policy: deny
+    logging: on

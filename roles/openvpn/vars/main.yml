@@ -1,0 +1,9 @@
+---
+
+key:
+  country: "DK"
+  province: "Zealand"
+  city: "Copenhagen"
+  organization: "NilOrg"
+  email: "admin@example.com"
+  organizational_unit: "Division-X"
