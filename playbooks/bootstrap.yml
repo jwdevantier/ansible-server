@@ -1,0 +1,91 @@
+---
+
+# Bootstrap Hosts
+# ===============
+#
+# Use by combining with the 'bootstrap' role.
+# To ensure other playbooks bootstrap hosts as needed, import this playbook before
+# any other plays, example:
+#
+#
+# ### [test-playbook.yml] ###
+# ---------------------------
+# - import_playbook: bootstrap.yml bootstrap_user=pseudo bootstrap_pass='my-secret-password'
+# - hosts: home.lab
+#   tasks:
+#     - debug:
+#         msg: "hello, world"
+# ---------------------------
+#
+# This will kick of this playbook which will install the regular ansible user and lock down
+# SSH (disable password authentication, disallow root login).
+# Note: any additional bootstrapping is up to your regular roles.
+#
+#
+# How it works:
+# -------------
+#
+# Fresh machines generally allow for some form of password login. This playbook tests
+# whether it can log in to the host via a provided SSH password and if so, the host is
+# considered eligible for bootstrapping.
+#
+# The next play uses a group compiled from all the hosts for which password login succeeded
+# and runs the 'bootstrap' role which installs a default admin user, installs its SSH keys,
+# and takes some basic steps to secure SSH, as described above.
+
+# Issues
+#
+# Port is hard-coded to 22. Cannot receive port as a variable as 'port: <>' must receive
+# an integer value and no matter what, the value remains a string.
+
+- hosts: "{{ with_hosts | default('all') }}"
+  gather_facts: false
+  tasks:
+    - set_fact:
+        bootstrap_user: "{{ bootstrap_user | default('ansible') }}"
+        bootstrap_pass: "{{ bootstrap_pass }}"
+      run_once: true
+    - block:
+        - shell: sshpass > /dev/null
+          connection: local
+          changed_when: false
+      rescue:
+        - debug:
+            msg: "'sshpass' must be installed (Debian: 'apt-get install -y sshpass')"
+          failed_when: true
+    - name: try password-based login (first-time run)
+      command: |
+        sshpass -p '{{ bootstrap_pass }}' 
+        ssh -T 
+          -o StrictHostKeyChecking=no
+          -o Port=22
+          -o PreferredAuthentications=password
+          -o PubkeyAuthentication=no
+          {{bootstrap_user}}@{{inventory_hostname}} 
+          echo 'success'
+      delegate_to: localhost
+      register: ssh_password_login
+      ignore_errors: true
+      changed_when: false
+    # 'add_host' runs only once (not once per host, as is normal).
+    # To run it once per host, we have to loop (hence 'with_items')
+    - name: create group of hosts to be bootstrapped
+      add_host:
+        name: "{{ item }}"
+        groups: bootstrap_hosts
+        ansible_ssh_pass: "{{ bootstrap_pass }}"
+        ansible_user: "{{ bootstrap_user }}"
+        ansible_port: 22
+        ansible_ssh_common_args: '-o PreferredAuthentications=password -o PubkeyAuthentication=no'
+      when: ssh_password_login.stdout == 'success'
+      with_items: "{{ ansible_play_hosts }}"
+      changed_when: false
+
+- hosts: bootstrap_hosts
+  become: "{{ become_user | default('root') != bootstrap_user }}"
+  become_user: root
+  become_method: su
+  port: 22
+  roles:
+    - bootstrap
+    # must install sudo entry, see https://stackoverflow.com/questions/37333305/ansible-create-a-user-with-sudo-privileges

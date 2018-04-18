@@ -1,0 +1,5 @@
+---
+# handlers file for roles/auth
+
+- name: reload SSH
+  command: systemctl reload sshd

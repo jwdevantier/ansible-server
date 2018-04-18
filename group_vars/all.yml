@@ -1,0 +1,9 @@
+# used by bootstrap playbook & role
+adm_user_name: ansible
+adm_user_state: present
+adm_user_shell: /bin/bash
+# mkpasswd -m sha-512   <-- get 'whois' package on Debian
+adm_user_passwd: $6$....
+adm_user_system: false
+adm_user_ssh_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDDUh9mZNLlzw5bQ1ZAL3o+WCAx0yCsiWqQZsV9uw8Np+QV4EFGCOKEdiYvfqrspHDjCYR/i/M9EtdBDR21uSOujhWkgDtwXOYM0pBYWPuOUV4747e0U6hzSoWajP7AIyDa7Z81GKBD7eo4ZvmChO/7+uuuPTSkK21+hgCeIftvbBKmZ7ZJyUO/iVVN6w+5nL2nuNLYDIz4vXgN/3I8al/nplFWiZD3YZ0IgsPaQR6QXX2fuWDvv/god/QRNcvTUFpXNgOYdaDkl9Cv6MGjZ0yq6Tph0rjAkAlcevcjT38MbahBTteqr0McQP6S8gamVTwLDyXrfp0tbxXhxh3Ap4XdsVj6aiMxqlu1ftWqXcBV1hMHzOhR2l9HfbNYtOJinqawzHCLdAj3MKFx2H6cENNfnkiZbOoHnz2t42trxa3hRTb4e0Yh0hpHCAcs5ZIUdWzllAHHLSZgTKOwQGA0Lkt+uyPwbGbkw3xufr6Q6KZhcOY1PkVT9zwMqg8D0dzKvv4WV2xcisfNldlSPwIACrpYxDUhjx2WuBfoAlJVaXdd5TOpjZmt4TvPYsrAh4D8JMEnq6458LSjQLDj3BSipcWF0OmF8WVa7juR7yPgRWyKAdDlQUnrfZ48FWLbx48NZOzrzCuV9mNCPa/K8eInYrw18Iez5WE3nGndAsH8S8OJKw== home.lan key

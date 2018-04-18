@@ -1,0 +1,31 @@
+---
+
+- name: install necessary software
+  apt:
+    name: "sudo"
+    state: present
+    cache_valid_time: 3600
+
+- name: "install default ansible user ({{ adm_user_name }})"
+  user:
+    name: "{{ adm_user_name }}"
+    createhome: true
+    comment: "Ansible host administration user"
+    append: yes # append to groups, don't override
+    state: "{{ adm_user_state }}"
+    shell: "{{ adm_user_shell }}"
+
+- name: "install admin authorized key(s)"
+  authorized_key:
+    user: "{{ adm_user_name }}"
+    key: "{{ item }}"
+  with_items: "{{ adm_user_ssh_keys }}"
+
+- name: "install sudo entry"
+  copy:
+    content: >
+      {{ adm_user_name }}   ALL=(ALL:ALL) NOPASSWD:ALL
+    dest: "/etc/sudoers.d/bootstrap_{{ adm_user_name }}"
+
+- name: "tweak SSH settings"
+  import_tasks: ssh_lockdown.yml

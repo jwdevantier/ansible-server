@@ -1,0 +1,10 @@
+---
+
+adm_user_name: ansible
+adm_user_state: present
+adm_user_shell: /bin/bash
+# mkpasswd -m sha-512   <-- get 'whois' package on Debian
+#adm_user_passwd: $6$......
+adm_user_system: false
+
+# 
