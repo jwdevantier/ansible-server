@@ -65,7 +65,7 @@
           echo 'success'
       delegate_to: localhost
       register: ssh_password_login
-      ignore_errors: true
+      failed_when: false
       changed_when: false
     # 'add_host' runs only once (not once per host, as is normal).
     # To run it once per host, we have to loop (hence 'with_items')
