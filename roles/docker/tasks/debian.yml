@@ -10,6 +10,7 @@
     - curl
     - gnupg2
     - software-properties-common
+    - python3-pip
 
 - name: Add repo key
   apt_key:
@@ -28,3 +29,7 @@
     state: installed
     force: true
   notify: "restart docker service"
+
+- name: Install python library for managing docker (Ansible)
+  pip:
+    name: docker
