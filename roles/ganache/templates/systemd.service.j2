@@ -1,0 +1,29 @@
+[Unit]
+Description={{ service_name }} (Dockerized) 
+Requires=docker.service
+
+[Service]
+ExecStartPre=/bin/sleep 1  
+ExecStartPre=-/usr/bin/docker stop "{{ container_name }}"
+ExecStartPre=-/usr/bin/docker rm "{{ container_name }}"
+ExecStartPre=/usr/bin/docker create \
+                             --restart=always \
+                             --name "{{ container_name }}" \
+                             -p {{ eth_rpc }}:8545 \
+                             -v "{{ eth_chain_db_volname }}:/eth-chain-db" \
+                             trufflesuite/ganache-cli:{{ container_tag }} \
+                             -i {{ eth_nw_id }} \
+                             --seed \
+                             {% if debug %}--debug {% endif %} \
+                             --db "/eth-chain-db" \
+                             --acounts "{{ eth_initial_accounts }}" \
+                             --defaultBalanceEther "{{ eth_default_balance_ether }}"
+
+ExecStart=/usr/bin/docker \
+    container start \
+    --attach "{{ container_name }}"
+
+ExecStop=/usr/bin/docker stop "{{ container_name }}" 
+ExecStopPost=/usr/bin/docker rm "{{ container_name }}"  
+
+[Install]

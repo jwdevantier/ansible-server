@@ -1,0 +1,20 @@
+---
+
+- name: get the image
+  docker_image:
+    name: "{{ container_image }}:{{ container_tag }}"
+
+- name: "start {{service_name}} service on boot"
+  template: 
+    src: systemd.service.j2
+    dest: /lib/systemd/system/{{service_name}}.service
+  notify: "restart ganache"
+
+- name: allow external access to ganache
+  ufw:
+    rule: allow
+    port: "{{ eth_rpc }}"
+    proto: tcp
+  notify:
+    - restart ufw
+  when: ufw_enabled

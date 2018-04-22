@@ -1,0 +1,9 @@
+---
+
+- name: "restart {{ service_name }}"
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: true
+    name: "{{ service_name }}"
+  listen: "restart {{ service_name }} service"

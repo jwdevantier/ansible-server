@@ -1,0 +1,17 @@
+---
+
+# docker
+container_image: trufflesuite/ganache-cli
+container_name: ganache
+container_tag: latest
+
+# systemd
+service_name: ganache
+
+# ganache (ethereum-specific)
+eth_rpc: 8545
+eth_nw_id: my-test-network
+debug: true
+eth_initial_accounts: 5
+eth_default_balance_ether: 1000
+eth_chain_db_volname: ganache_blockchain_db
