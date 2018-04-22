@@ -1,0 +1,12 @@
+---
+owner_user: sabnzbd
+owner_group: sabnzbd
+
+timezone: Europe/Copenhagen
+path_complete: asd
+path_incomplete: asd
+path_config: asd
+web_ui_http: 8200
+web_ui_https: 8201
+container_name: sabnzbd
+container_tag: latest

@@ -1,0 +1,9 @@
+---
+
+- name: restart sabnzbd
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: true
+    name: sabnzbd
+  listen: "restart sabnzbd service"

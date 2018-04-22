@@ -1,0 +1,42 @@
+---
+
+- name: "ensure '{{ owner_group }}' group exists"
+  group:
+    name: "{{ owner_group }}"
+    state: present
+  register: group
+
+- name: "ensure '{{ owner_user }}' user exists"
+  user:
+    name: "{{ owner_user }}"
+    group: "{{ owner_group }}"
+  register: user
+
+- name: create download & config directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ owner_user }}"
+    group: "{{ owner_group }}"
+    mode: 0775
+    recurse: yes
+  with_items:
+  - "{{ path_complete }}"
+  - "{{ path_incomplete }}"
+  - "{{ path_config }}"
+
+
+- name: get the image
+  docker_image:
+    name: "linuxserver/sabnzbd:{{ container_tag }}"
+
+- name: record uid & gid
+  set_fact:
+    owner_group_id: "{{ group.gid }}"
+    owner_user_id: "{{ user.uid }}"
+
+- name: start Sabnzbd Service on boot
+  template: 
+    src: systemd.service.j2
+    dest: /lib/systemd/system/sabnzbd.service
+  notify: "restart sabnzbd"
