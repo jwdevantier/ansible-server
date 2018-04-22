@@ -1,16 +1,36 @@
 ---
 
-- name: Install requirements (Debian)
-  apt: name={{item}} force=yes
-  with_items: [ufw]
+- name: install UFW
+  apt:
+    package: ufw
+    state: present
+    cache_valid_time: 3600
 
-- name: Enable SSH
+- name: configure UFW default policies
   ufw:
-    app: SSH
-    rule: allow
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+  with_items: "{{ ufw_policies }}"
+  notify:
+    - restart ufw
 
-- name: Enable firewall
+- name: enable UFW logging
+  ufw:
+    logging: true
+  notify:
+    - restart ufw
+
+- name: enable SSH with UFW
+  ufw:
+    rule: limit
+    port: "{{ ssh_port }}"
+    proto: tcp
+  notify:
+    - restart ufw
+
+- name: enable ufw
   ufw:
     state: enabled
-    policy: deny
-    logging: on
+
+- set_fact:
+    ufw_enabled: true
