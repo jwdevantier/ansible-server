@@ -1,3 +1,12 @@
+ansible_user: ansible
+become: true
+become_method: sudo
+become_user: root
+ansible_ssh_common_args: '-o PreferredAuthentications=publickey,password'
+
+bootstrap_user: pseudo
+bootstrap_pass: qazwsx12
+
 # used by bootstrap playbook & role
 adm_user_name: ansible
 adm_user_state: present
