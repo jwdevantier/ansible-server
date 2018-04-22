@@ -1,8 +1,12 @@
 [all:vars]
 # works - but spews a *LOT* of garbage.... (https://bugs.python.org/issue29519)
-#ansible_python_interpreter=/usr/bin/python3
-ansible_user=root
-ansible_ssh_private_key_file=~/.ssh/id_serverkey
+ansible_python_interpreter=/usr/bin/python3
+# each time I set this to password ONLY.. Things work
+# TODO: try setting this var on the group only
+#ansible_ssh_common_args='-o PreferredAuthentications=password,publickey'
 
-[server]
-example.com
+[home.lab]
+macmini.local
+
+[home.lab2]
+macmini.local
