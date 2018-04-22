@@ -1,0 +1,8 @@
+---
+
+# This role is mainly a work-around for the issue where attempting
+# to create/manage volumes with 'docker_volume' fails if the system has
+# no pre-existing volumes.
+
+- include_tasks: mk_vol.yml volume_name="{{ item }}"
+  with_items: "{{ volumes }}"

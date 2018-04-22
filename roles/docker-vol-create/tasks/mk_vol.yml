@@ -1,0 +1,11 @@
+---
+
+- name: Check Volume
+  shell: /usr/bin/docker volume ls | grep "{{ volume_name }}" | wc -l
+  register: docker_volume
+  changed_when: false
+
+- name: Create Docker Volume
+  command: /usr/bin/docker volume create "{{ volume_name }}"
+  when: docker_volume.stdout != "1"
+  

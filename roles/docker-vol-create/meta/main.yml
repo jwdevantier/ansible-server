@@ -1,0 +1,9 @@
+galaxy_info:
+  author: Jesper W. Devantier
+  description: creates docker volumes conditionally
+  license: MIT
+  min_ansible_version: 2.5
+  galaxy_tags: []
+
+dependencies:
+- docker
