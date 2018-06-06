@@ -1,0 +1,63 @@
+---
+- name: make configuration directory
+  file:
+    state: directory
+    recurse: true
+    path: "/etc/docker-services"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "install {{ container_name }} container script"
+  template:
+    src: container-mgmt.sh
+    dest: "/etc/docker-services/{{ container_name }}"
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+  - "restart {{ container_service_name }}"
+
+- name: install service file
+  template:
+    src: service.j2
+    dest: /etc/systemd/system/{{ container_service_name }}.service
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  notify:
+  - "restart {{ container_service_name }}"
+
+#- name: download service image
+#  shell: >
+#  docker pull {{name}}:{{tag|default('latest')}}
+
+# - name: download service image
+#   docker_pull:
+#     image: "{{ container_image }}"
+#   register: image
+
+- name: pull service image
+  docker_image:
+    name: "{{ container_image }}"
+
+# - name: create service container
+#   docker_container:
+#     image: "{{image}}"
+#     name: "{{name}}"
+#     volumes: "{{volumes}}"
+#     ports: "{{ports}}"
+
+# - name: create container
+#   shell: >
+#     docker container create 
+#     --name {{name}}
+#     -p {{ports|join(' -p ')}}
+#     -v {{volumes|join(' -v ')}}
+#     {{image}}
+#   when: "image.changed"
+
+# - name: activate service file
+#   service:
+#     name: "{{name}}"
+#     state: started

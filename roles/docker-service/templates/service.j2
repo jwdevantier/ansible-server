@@ -1,0 +1,14 @@
+[Unit]
+Description={{ description | default(container_service_name + ' container') }}
+After=docker.service {{ after | default([]) | map('map_format', '%s.service' ) | join(' ') }}
+Requires=docker.service
+
+[Service]
+Restart=always
+ExecStartPre-=/etc/docker-services/{{ container_service_name }} destroy
+ExecStartPre=/etc/docker-services/{{ container_service_name }} create
+ExecStart=/usr/bin/docker start -a {{ container_service_name }}
+ExecStop=/usr/bin/docker stop -t 2 {{ container_service_name }}
+
+[Install]
+WantedBy=local.target

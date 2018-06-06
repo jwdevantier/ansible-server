@@ -1,0 +1,12 @@
+---
+# defaults file for docker-service
+
+container_enabled: true
+#container_name: <actual container name>
+container_service_name: "{{ container_name }}"
+
+# args given to docker during container creation
+container_docker_args: 
+# args to the actual program / container
+container_program_args:
+# container_image: nginx/nginx

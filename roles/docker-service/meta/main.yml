@@ -1,0 +1,15 @@
+galaxy_info:
+  author: Jesper Wendel Devantier
+  description: Install docker container as a systemd service
+  license: BSD
+  min_ansible_version: 2.5
+
+  platforms:
+  - name: Debian
+    versions:
+    - stretch
+
+  galaxy_tags: []
+
+dependencies:
+- docker
