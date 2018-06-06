@@ -1,0 +1,26 @@
+galaxy_info:
+  author: Jesper Wendel Devantier
+  description: Install docker container as a systemd service
+  license: BSD
+  min_ansible_version: 2.5
+
+  platforms:
+  - name: Debian
+    versions:
+    - stretch
+
+  galaxy_tags: []
+
+dependencies:
+- role: docker-service
+  container_name: "seafile"
+  container_service_name: "seafile"
+  container_docker_args: >
+    -v {{ seafile_data }}:/shared
+    -p {{ seafile_listen_address }}:{{ seafile_port }}:80
+    -e SEAFILE_ADMIN_EMAIL='{{ seafile_admin_email }}'
+    -e SEAFILE_ADMIN_PASSWORD='{{ seafile_admin_password }}'
+    -e SEAFILE_SERVER_HOSTNAME='{{ seafile_hostname }}'
+    -e SEAFILE_SERVER_LETSENCRYPT={{ seafile_ssl_port is defined }}
+    {% if seafile_ssl_port is defined %}-p {{ seafile_listen_address }}:{{ seafile_ssl_port }}:443{% endif %}
+  container_image: seafileltd/seafile:latest

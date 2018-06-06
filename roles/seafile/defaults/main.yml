@@ -1,0 +1,19 @@
+---
+
+# see https://hub.docker.com/r/seafileltd/seafile/tags/
+seafile_docker_image_tag: latest
+
+# can be a path (in which case it'll be treated as a host-mounted volume)
+seafile_data: "{{ seafile_service_name }}_data"
+
+seafile_admin_email: contact@pseudonymous.me
+#seafile_admin_password: s3cr3t
+
+#seafile_hostname: seafile.example.com
+
+seafile_port: 80
+seafile_listen_address: "0.0.0.0"
+# if defined, exports SSL port AND requests SSL certs from letsencrypt
+#seafile_ssl_port: 443
+
+
