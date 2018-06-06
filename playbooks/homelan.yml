@@ -1,0 +1,33 @@
+---
+- import_playbook: bootstrap.yml
+
+- hosts: macmini.local
+  vars_files:
+    - ../vars/homelan_sabnzbd.yml
+    - ../vars/homelan_secrets.yml
+  vars:
+    seafile_hostname: seafile.papply.net
+    seafile_port: 6001
+  become: true
+  become_method: sudo
+  become_user: root
+  roles:
+  - role: ufw
+    ssh_port: 22
+    ufw_policies:
+    - direction: incoming
+      policy: deny
+    - direction: outgoing
+      policy: allow
+  - sabnzbd
+  - ganache
+  - role: seafile
+    seafile_data: /data/seafile
+  - role: revproxy
+    vhosts:
+    - server_name: "{{ seafile_hostname }}"
+      label: seafile
+      addr: localhost
+      port: "{{ seafile_port }}"
+    cert_email: certs@pseudonymous.me
+    revproxy_open_ports: true

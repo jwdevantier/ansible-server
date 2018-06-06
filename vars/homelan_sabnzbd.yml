@@ -1,0 +1,8 @@
+---
+
+path_complete: /data/sabnzbd/Downloads/complete
+path_incomplete: /data/sabnzbd/Downloads/incomplete
+path_config: /data/sabnzbd/.sabnzbd
+
+web_ui_http: 8200
+web_ui_https: 8201
