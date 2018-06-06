@@ -1,5 +1,23 @@
 ---
 
 - name: restart docker
-  systemd: state=restarted daemon_reload=yes name=docker
+  systemd:
+    state: restarted
+    daemon_reload: true
+    enabled: true
+    name: docker-ce
+  listen: "restart docker service"
+
+- name: start docker
+  systemd:
+    state: started
+    daemon_reload: true
+    enabled: true
+    name: docker-ce
+  listen: "restart docker service"
+
+- name: stop docker
+  systemd:
+    state: restarted
+    name: docker-ce
   listen: "restart docker service"
