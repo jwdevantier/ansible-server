@@ -69,16 +69,16 @@ case_start () {
 
 case "$1" in
     start)
-        case_start "{{ container_service_name }}"
+        case_start "{{ container_name }}"
         ;;
     stop)
-        case_stop "{{ container_service_name }}"
+        case_stop "{{ container_name }}"
         ;;
     create)
-        case_create "{{ container_service_name }}"
+        case_create "{{ container_name }}"
         ;;
     destroy)
-        case_destroy "{{ container_service_name }}"
+        case_destroy "{{ container_name }}"
         ;;
     *)
         err "Usage $0 {create|destroy|start|stop}"
