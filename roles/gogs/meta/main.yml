@@ -1,0 +1,23 @@
+galaxy_info:
+  author: Jesper Wendel Devantier
+  description: Install docker container as a systemd service
+  license: BSD
+  min_ansible_version: 2.5
+
+  platforms:
+  - name: Debian
+    versions:
+    - stretch
+
+  galaxy_tags: []
+
+dependencies:
+- role: container
+  container_name: "{{ gogs_container_name }}"
+  container_service_name: "{{ gogs_service_name }}"
+  container_docker_args: >
+    -v {{ gogs_vol_data }}:/data
+    -p {{ gogs_listen_address }}:{{ gogs_port_http}}:3000
+    -p {{ gogs_listen_address }}:{{ gogs_port_ssh }}:22
+  container_image: gogs/gogs:{{ gogs_docker_image_tag }}
+  container_service_notify: "restart {{ gogs_service_name }}"

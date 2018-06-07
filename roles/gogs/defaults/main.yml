@@ -1,0 +1,15 @@
+---
+
+gogs_service_name: gogs
+gogs_container_name: gogs
+
+gogs_docker_image_tag: latest
+
+gogs_listen_address: 0.0.0.0
+# interaction with repositories is over SSH
+#gogs_port_ssh: 8022
+# navigating the web interface
+#gogs_port_http: 3000
+
+# where to store the data, can be a named- or host-mounted volume
+#gogs_vol_data: /data/gogs
