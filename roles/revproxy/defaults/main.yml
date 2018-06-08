@@ -1,2 +1,5 @@
 ---
 # defaults file for revproxy
+
+# true iff revproxy should attempt opening firewall ports
+revproxy_open_ports: false

@@ -46,7 +46,7 @@
 - name: generate certs
   shell: >
     docker run --rm
-    -v {{cert_email}}:/etc/letsencrypt
+    -v {{certs_root}}:/etc/letsencrypt
     -p 80:80
     certbot/certbot certonly
     --standalone
@@ -89,3 +89,15 @@
   debug: msg="restarting nginx..."
   changed_when: true
   notify: "restart nginx service"
+
+- name: enable SSH with UFW
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+  - 80
+  - 443
+  when: ufw_enabled|default(false) and revproxy_open_ports
+  notify:
+    - restart ufw
