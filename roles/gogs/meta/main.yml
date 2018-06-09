@@ -12,7 +12,7 @@ galaxy_info:
   galaxy_tags: []
 
 dependencies:
-- role: container
+- role: "@container"
   container_name: "{{ gogs_container_name }}"
   container_service_name: "{{ gogs_service_name }}"
   container_docker_args: >
