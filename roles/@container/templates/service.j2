@@ -8,7 +8,6 @@ Restart=always
 ExecStartPre-=/etc/docker-services/{{ container_name }} destroy
 ExecStartPre=/etc/docker-services/{{ container_name }} create
 ExecStart=/usr/bin/docker start -a {{ container_name }}
-ExecStop=/usr/bin/docker stop -t 2 {{ container_name }}
-
+ExecStop=/etc/docker-services/{{ container_name }} destroy
 [Install]
 WantedBy=local.target
