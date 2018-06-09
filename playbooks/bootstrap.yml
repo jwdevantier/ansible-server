@@ -33,10 +33,15 @@
 # and runs the 'bootstrap' role which installs a default admin user, installs its SSH keys,
 # and takes some basic steps to secure SSH, as described above.
 
-# Issues
-#
-# Port is hard-coded to 22. Cannot receive port as a variable as 'port: <>' must receive
-# an integer value and no matter what, the value remains a string.
+# Requirements
+# 'ansible_port' must be a defined variable. For minimum effort, add:
+# ---
+# [all:vars]
+# ansible_port = 22
+# ---
+# ... to your 'inventory' file. The bootstrap playbook supports bootstrapping hosts whose
+# SSH daemon listen to non-standard ports, simply redefine 'ansible_port' for the relevant
+# host group.
 
 - hosts: "{{ with_hosts | default('all') }}"
   gather_facts: false
@@ -49,6 +54,7 @@
         - shell: sshpass > /dev/null
           connection: local
           changed_when: false
+          become: false
       rescue:
         - debug:
             msg: "'sshpass' must be installed (Debian: 'apt-get install -y sshpass')"
@@ -58,7 +64,7 @@
         sshpass -p '{{ bootstrap_pass }}' 
         ssh -T 
           -o StrictHostKeyChecking=no
-          -o Port=22
+          -o Port={{ bootstrap_port | default(ansible_port) }}
           -o PreferredAuthentications=password
           -o PubkeyAuthentication=no
           {{bootstrap_user}}@{{inventory_hostname}} 
@@ -67,18 +73,33 @@
       register: ssh_password_login
       failed_when: false
       changed_when: false
+      become: false
     # 'add_host' runs only once (not once per host, as is normal).
     # To run it once per host, we have to loop (hence 'with_items')
     - name: create group of hosts to be bootstrapped
       add_host:
         name: "{{ item }}"
         groups: bootstrap_hosts
-        ansible_ssh_pass: "{{ bootstrap_pass }}"
         ansible_user: "{{ bootstrap_user }}"
-        ansible_port: 22
+        ansible_ssh_pass: "{{ bootstrap_pass }}"
+        ansible_port: "{{ bootstrap_port | default(ansible_port) }}"
         ansible_ssh_common_args: '-o PreferredAuthentications=password -o PubkeyAuthentication=no'
       when: ssh_password_login.stdout == 'success'
       with_items: "{{ ansible_play_hosts }}"
+      changed_when: false
+
+- hosts: bootstrap_hosts
+  become: "{{ become_user | default('root') != bootstrap_user }}"
+  become_user: root
+  become_method: su
+  gather_facts: false
+  tasks:
+    - debug:
+        msg: "Will try to connect, if it times out, add '--ask-become-pass' and re-run"
+      run_once: true
+      delegate_to: 127.0.0.1
+    - name: "connecting..."
+      shell: echo "{{ inventory_hostname }}... connected!"
       changed_when: false
 
 - hosts: bootstrap_hosts

@@ -4,6 +4,7 @@ ansible_python_interpreter=/usr/bin/python3
 # each time I set this to password ONLY.. Things work
 # TODO: try setting this var on the group only
 #ansible_ssh_common_args='-o PreferredAuthentications=password,publickey'
+ansible_port = 22
 
 [home.lab]
 macmini.local
