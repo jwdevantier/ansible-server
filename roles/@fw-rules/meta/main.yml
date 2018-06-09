@@ -1,0 +1,14 @@
+galaxy_info:
+  author: Jesper Wendel Devantier
+  description: Helper role, installs a list of firewall rules
+  license: BSD
+  min_ansible_version: 2.5
+
+  platforms:
+  - name: Debian
+    versions:
+    - stretch
+
+  galaxy_tags: []
+
+dependencies: []

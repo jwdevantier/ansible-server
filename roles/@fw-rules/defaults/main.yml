@@ -1,0 +1,8 @@
+---
+
+default_policy: allow
+default_proto: tcp
+default_src: any
+default_dest: any
+default_direction: in
+default_comment: 'installed by ansible'

@@ -1,0 +1,15 @@
+---
+
+- name: enable SSH with UFW
+  ufw:
+    rule: "{{ item.policy|default(default_policy) }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto | default(default_proto) }}"
+    src: "{% if item.src|default(default_src)|lower is sameas 'lan' %}{{ fw_nw_lan }}{% else %}{{ item.src|default(default_src)|lower }}{% endif %}"
+    dest: "{% if item.dest|default(default_dest)|lower is sameas 'lan' %}{{ fw_nw_lan }}{% else %}{{ item.dest|default(default_dest)|lower }}{% endif %}"
+    direction: "{{ item.direction|default(default_direction) }}"
+    comment: "{{ item.desc|default(default_comment) }}"
+  with_items: "{{ rules }}"
+  when: ufw_enabled|default(false)
+  notify:
+    - restart ufw
