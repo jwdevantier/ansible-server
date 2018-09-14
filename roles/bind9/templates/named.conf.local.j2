@@ -1,0 +1,20 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+{% for zone in bind9_zones %}
+zone "{{ zone.domain }}" {
+    type master;
+    file "/etc/bind/db.{{ zone.domain }}";
+};
+{% set a, b, c = zone.network.split('.') %}
+zone "{{c|int}}.{{ b|int }}.{{ a|int }}.in-addr.arpa" {
+    type master;
+    notify no;
+    file "/etc/bind/db.{{ zone.domain }}.rev";
+};
+{% endfor %}

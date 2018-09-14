@@ -1,0 +1,30 @@
+---
+
+- name: configuring DNS zone...
+  debug:
+    msg: "zone: {{zone.domain}}"
+
+- set_fact:
+    zone_reverse: "{% set a,b,c = zone.network.split('.') %}{{c|int}}.{{b|int}}.{{a|int}}"
+
+# - name: configuring DNS zone...
+#   debug:
+#     msg: "{{ zone.domain }} - {{ zone.network }} => {{ zone_reverse }}"
+
+- name: install forward zone lookup
+  template:
+    src: db.zone.j2
+    dest: /etc/bind/db.{{ zone.domain }}
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  notify: "restart bind9 service"
+
+- name: install reverse zone lookup
+  template:
+    src: db.zone.rev.j2
+    dest: /etc/bind/db.{{ zone.domain }}.rev
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  notify: "restart bind9 service"

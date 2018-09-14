@@ -1,0 +1,23 @@
+---
+
+- name: restart bind9 DNS server
+  systemd:
+    state: restarted
+    daemon_reload: true
+    enabled: true
+    name: bind9
+  listen: "restart bind9 service"
+
+- name: start bind9 DNS server
+  systemd:
+    state: started
+    daemon_reload: true
+    enabled: true
+    name: bind9
+  listen: "restart bind9 service"
+
+- name: stop bind9 DNS server
+  systemd:
+    state: restarted
+    name: bind9
+  listen: "restart bind9 service"

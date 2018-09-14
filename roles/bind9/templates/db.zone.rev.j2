@@ -1,0 +1,16 @@
+;
+; BIND reverse data file for domain: '{{ zone.domain }}'
+;
+$TTL	604800
+@	IN	SOA	{{ ansible_hostname }}.{{ zone.domain }}. {{ zone.adm_email | replace('@', '.') }}. (
+			      1		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@	IN	NS	{{ ansible_hostname }}.{{ zone.domain }}.
+{{ zone.gw_addr | default(1) | int }}	IN	PTR	{{ ansible_hostname }}.{{ zone.domain }}
+{% for a_record in zone.a_records %}
+{{ a_record.addr|int }}  IN  PTR   {{ a_record.subdomain }}.{{ zone.domain }}.
+{% endfor %}

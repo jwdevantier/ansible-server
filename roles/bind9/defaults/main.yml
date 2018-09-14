@@ -1,0 +1,18 @@
+---
+
+# DNS servers to forward requests to (when unable to answer)
+bind9_forwarders:
+  - 8.8.8.8
+
+bind9_zones:
+- domain: home
+  # addr of bind host - e.g. '1' => {{network}}.1
+  #gw_addr: 1
+  network: 10.7.5
+  adm_email: contact@pseudonymous.me
+  a_records:
+  - subdomain: gw
+    addr: 1
+  c_records:
+  - alias: fw
+    dest: gw

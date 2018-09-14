@@ -1,0 +1,44 @@
+---
+
+- name: install software requirements
+  apt:
+    name: "{{ item }}"
+    force: yes
+    cache_valid_time: 3600
+  with_items:
+  - bind9
+  - bind9-doc
+  - dnsutils
+  register: bind9_apt
+  failed_when: false
+
+- name: install bind9 DNS forward entries
+  template:
+    src: named.conf.options.j2
+    dest: /etc/bind/named.conf.options
+    owner: root
+    group: bind
+    mode: "u=rw,g=r,o=r"
+  notify: "restart bind9 service"
+
+- name: install bind9 zone index
+  template:
+    src: named.conf.local.j2
+    dest: /etc/bind/named.conf.local
+    owner: root
+    group: bind
+    mode: "u=rw,g=r,o=r"
+  notify: "restart bind9 service"
+
+- name: "install zone {{ zone.domain }}"
+  include_tasks: "zone_dbs.yml"
+  with_items: "{{ bind9_zones }}"
+  loop_control:
+    loop_var: zone
+
+- name: ensure bind9 DNS server is started
+  systemd:
+    state: started
+    daemon_reload: true
+    enabled: true
+    name: bind9

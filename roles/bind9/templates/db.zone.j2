@@ -1,0 +1,28 @@
+;
+; BIND data file for domain: '{{ zone.domain }}'
+;
+$TTL	604800
+@	IN	SOA	{{ ansible_hostname }}.{{ zone.domain }}. {{ zone.adm_email | replace('@', '.') }}. (
+			      2		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@	IN	NS	{{ ansible_hostname }}.{{ zone.domain }}.
+@	IN	A	127.0.0.1
+@	IN	AAAA	::1
+
+;; Below are A-record Addresses
+;; ----------------------------
+{{ ansible_hostname }}  IN  A   {{ zone.network }}.{{ zone.gw_addr | default(1) }}
+{% for a_record in zone.a_records %}
+{{ a_record.subdomain }}  IN  A   {{ zone.network }}.{{ a_record.addr }}
+{% endfor %}
+
+;; Below are CNAME (alias) Record Addresses
+;; (A CNAME-record points to an A-record)
+;; ----------------------------------------
+{% for c_record in zone.c_records %}
+{{ c_record.alias }}  IN  CNAME   {{ c_record.dest }}.{{ zone.domain }}.
+{% endfor %}
